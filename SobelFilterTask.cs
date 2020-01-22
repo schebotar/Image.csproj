@@ -4,25 +4,36 @@ namespace Recognizer
 {
     internal static class SobelFilterTask
     {
-        public static double[,] SobelFilter(double[,] g, double[,] sx)
+        public static double SobelValue(double[,] input, double[,] sx, int firstRow, int firstCol)
         {
-            var width = g.GetLength(0);
-            var height = g.GetLength(1);
-            var result = new double[width, height];
-            for (int x = 1; x < width - 1; x++)
-                for (int y = 1; y < height - 1; y++)
+            var kernelSize = sx.GetLength(0);
+            var gx = 0.0;
+            var gy = 0.0;
+            for (int i = 0; i < kernelSize; ++i)
+            {
+                for (int j = 0; j < kernelSize; ++j)
                 {
-                    // Вместо этого кода должно быть поэлементное умножение матриц sx и полученной транспонированием из неё sy на окрестность точки (x, y)
-                    // Такая операция ещё называется свёрткой (Сonvolution)
-                    var gx = 
-                        -g[x - 1, y - 1] - 2 * g[x, y - 1] - g[x + 1, y - 1] 
-                        + g[x - 1, y + 1] + 2 * g[x, y + 1] + g[x + 1, y + 1];
-                    var gy = 
-                        -g[x - 1, y - 1] - 2 * g[x - 1, y] - g[x - 1, y + 1] 
-                        + g[x + 1, y - 1] + 2 * g[x + 1, y] + g[x + 1, y + 1];
-                    result[x, y] = Math.Sqrt(gx * gx + gy * gy);
+                    gx += input[firstRow + i, firstCol + j] * sx[i, j];
+                    gy += input[firstRow + i, firstCol + j] * sx[j, i];
                 }
-            return result;
+            }
+            return Math.Sqrt(gx * gx + gy * gy);
+        }
+
+        public static double[,] SobelFilter(double[,] input, double[,] sx)
+        {
+            var numRows = input.GetLength(0);
+            var numCols = input.GetLength(1);
+            var kernelBorder = sx.GetLength(0) / 2;
+            var output = new double[numRows, numCols];
+            for (var row = kernelBorder; row < numRows - kernelBorder; ++row)
+            {
+                for (var col = kernelBorder; col < numCols - kernelBorder; ++col)
+                {
+                    output[row, col] = SobelValue(input, sx, row - kernelBorder, col - kernelBorder);
+                }
+            }
+            return output;
         }
     }
 }
