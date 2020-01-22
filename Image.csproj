@@ -72,6 +72,7 @@
     <Compile Include="Line.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ThresholdFilterTask.cs" />
+    <Compile Include="ThresholdFilterTaskTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
